@@ -24,7 +24,7 @@ export interface BlueprintConstructProps {
 export default class BlueprintConstruct {
     constructor(scope: Construct, props: cdk.StackProps) {
 
-        blueprints.HelmAddOn.validateHelmVersions = true;
+        blueprints.HelmAddOn.validateHelmVersions = false;
         blueprints.HelmAddOn.failOnVersionValidation = false;
         logger.settings.minLevel = 3; // info
         userLog.settings.minLevel = 2; // debug
@@ -89,7 +89,7 @@ export default class BlueprintConstruct {
             new blueprints.KubeRayAddOn(),
             new blueprints.addons.AwsLoadBalancerControllerAddOn(),
             new blueprints.addons.AppMeshAddOn(),
-            new blueprints.addons.CalicoOperatorAddOn(),
+            /*new blueprints.addons.CalicoOperatorAddOn(),
             new blueprints.addons.CertManagerAddOn(),
             new blueprints.addons.KubeStateMetricsAddOn(),
             new blueprints.addons.PrometheusNodeExporterAddOn(),
@@ -112,15 +112,15 @@ export default class BlueprintConstruct {
             new blueprints.addons.IstioControlPlaneAddOn(),
             new blueprints.addons.IstioCniAddon(),
             new blueprints.addons.IstioIngressGatewayAddon(),
-            new blueprints.addons.MetricsServerAddOn(),
+            new blueprints.addons.MetricsServerAddOn(),*/
             new blueprints.addons.SecretsStoreAddOn(),
-            new blueprints.addons.ArgoCDAddOn(),
+           /*new blueprints.addons.ArgoCDAddOn(),
             new blueprints.addons.SSMAgentAddOn(),
             new blueprints.addons.NginxAddOn({
                 values: {
                     controller: { service: { create: false } }
                 }
-            }),
+            }),*/
             // new blueprints.addons.VeleroAddOn(),
             new blueprints.addons.VpcCniAddOn({
                 customNetworkingConfig: {
@@ -136,21 +136,21 @@ export default class BlueprintConstruct {
             }),
             new blueprints.addons.CoreDnsAddOn(),
             new blueprints.addons.KubeProxyAddOn(),
-            new blueprints.addons.OpaGatekeeperAddOn(),
+            //new blueprints.addons.OpaGatekeeperAddOn(),
             new blueprints.addons.AckAddOn({
                 id: "s3-ack",
                 createNamespace: true,
                 skipVersionValidation: true,
                 serviceName: blueprints.AckServiceName.S3
             }),
-            new blueprints.addons.KarpenterAddOn({
+            /*new blueprints.addons.KarpenterAddOn({
                 version: "v0.33.2",
                 nodePoolSpec: nodePoolSpec,
                 ec2NodeClassSpec: nodeClassSpec,
                 interruptionHandling: true,
             }),
             new blueprints.addons.AwsNodeTerminationHandlerAddOn(),
-            new blueprints.addons.KubeviousAddOn(),
+            new blueprints.addons.KubeviousAddOn(),*/
             new blueprints.addons.EbsCsiDriverAddOn({
                 addOnName: "aws-ebs-csi-driver",
                 version: "v1.26.1-eksbuild.1",
@@ -171,7 +171,7 @@ export default class BlueprintConstruct {
                 blueprints.getResource( context => new kms.Key(context.scope, "efs-csi-driver-key", { alias: "efs-csi-driver-key"})),
               ],
             }),
-            new blueprints.addons.KedaAddOn({
+            /*new blueprints.addons.KedaAddOn({
                 podSecurityContextFsGroup: 1001,
                 securityContextRunAsGroup: 1001,
                 securityContextRunAsUser: 1001,
@@ -188,11 +188,11 @@ export default class BlueprintConstruct {
             //     notebookStack: 'jupyter/datascience-notebook',
             //     values: { prePuller: { hook: { enabled: false }}}
             // }),
-            new blueprints.EmrEksAddOn(),
+            //new blueprints.EmrEksAddOn(),
             new blueprints.AwsBatchAddOn(),
             // Commenting due to conflicts with `CloudWatchLogsAddon`
             // new blueprints.AwsForFluentBitAddOn(),
-            new blueprints.FluxCDAddOn(),
+           /* new blueprints.FluxCDAddOn(),
             new blueprints.GpuOperatorAddon({
                 values:{
                     driver: {
@@ -234,7 +234,8 @@ export default class BlueprintConstruct {
             new blueprints.ExternalsSecretsAddOn(),
             new blueprints.EksPodIdentityAgentAddOn(),
             new blueprints.NeuronDevicePluginAddOn(),
-            new blueprints.NeuronMonitorAddOn()
+            new blueprints.NeuronMonitorAddOn(),*/
+            new blueprints.UpboundCrossplaneAddOn()
         ];
 
         // Instantiated to for helm version check.
@@ -254,8 +255,8 @@ export default class BlueprintConstruct {
             managedNodeGroups: [
                 addGenericNodeGroup(),
                 addCustomNodeGroup(),
-                addWindowsNodeGroup(), //  commented out to check the impact on e2e
-                addGpuNodeGroup()
+                //addWindowsNodeGroup(), //  commented out to check the impact on e2e
+                //addGpuNodeGroup()
             ]
         });
 
@@ -316,7 +317,7 @@ export default class BlueprintConstruct {
             .resourceProvider('apache-airflow-efs-provider', apacheAirflowEfs)
             .clusterProvider(clusterProvider)
             .resourceProvider(ampWorkspaceName, new blueprints.CreateAmpProvider(ampWorkspaceName, ampWorkspaceName))
-            .teams(...teams, new blueprints.EmrEksTeam(dataTeam), new blueprints.BatchEksTeam(batchTeam))
+            .teams(...teams)
             .enableControlPlaneLogTypes(blueprints.ControlPlaneLogType.API)
             .build(scope, blueprintID, props);
 
